@@ -22,11 +22,11 @@ private
 
   def example(signer, payload, expected)
     # Pass instance of OpenSSL::PKey::PKey.
-    returned = JWT::Multisig.generate_jws(payload, signer, keys.fetch(signer), algorithms.fetch(signer))
+    returned = JWT::Multisignature.generate_jws(payload, signer, keys.fetch(signer), algorithms.fetch(signer))
     assert_equal expected, JSON.dump(returned)
 
     # Pass key in PEM format.
-    returned = JWT::Multisig.generate_jws(payload, signer, keys.fetch(signer).to_pem, algorithms.fetch(signer))
+    returned = JWT::Multisignature.generate_jws(payload, signer, keys.fetch(signer).to_pem, algorithms.fetch(signer))
     assert_equal expected, JSON.dump(returned)
   end
 end

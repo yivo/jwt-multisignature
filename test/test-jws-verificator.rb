@@ -75,11 +75,11 @@ private
 
   def example(jws, payload, options, expected)
     # Pass instance of OpenSSL::PKey::PKey.
-    returned = JWT::Multisig.verify_jws(JSON.parse(jws), payload, public_keychain, options)
+    returned = JWT::Multisignature.verify_jws(JSON.parse(jws), payload, public_keychain, options)
     assert_equal expected, JSON.dump(returned)
 
     # Pass key in PEM format.
-    returned = JWT::Multisig.verify_jws(JSON.parse(jws), payload, public_keychain, options)
+    returned = JWT::Multisignature.verify_jws(JSON.parse(jws), payload, public_keychain, options)
     assert_equal expected, JSON.dump(returned)
   end
 end

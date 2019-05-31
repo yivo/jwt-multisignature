@@ -43,7 +43,7 @@ class JWTVerificatorTest < Test::Unit::TestCase
 private
 
   def example(jwt, keychain, options, expected)
-    returned = JWT::Multisig.verify_jwt(JSON.parse(jwt), keychain, options)
+    returned = JWT::Multisignature.verify_jwt(JSON.parse(jwt), keychain, options)
     assert_equal expected, JSON.dump(returned)
   end
 end

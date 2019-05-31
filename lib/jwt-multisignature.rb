@@ -11,7 +11,7 @@ module JWT
   #
   # The module provides tools for encoding/decoding JWT with multiple signatures.
   #
-  module Multisig
+  module Multisignature
     class << self
       #
       # Generates new JWT based on payload, keys, and algorithms.
@@ -254,3 +254,5 @@ module JWT
     end
   end
 end
+
+JWT::Multisig = JWT::Multisignature # Compatibility.
