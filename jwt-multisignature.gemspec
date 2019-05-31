@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.version         = JWT::Multisignature::VERSION
   s.author          = "Yaroslav Konoplov"
   s.email           = "eahome00@gmail.com"
-  s.summary         = "Implements JWT with multiple signatures (RFC 7515)"
+  s.summary         = "Implements JWT with multiple signatures (RFC 7515)."
   s.description     = "The gem implements support of RFC 7515 providing easy way to create JWT and add/remove/verify signatures."
   s.homepage        = "https://github.com/yivo/jwt-multisignature"
   s.license         = "Apache-2.0"
