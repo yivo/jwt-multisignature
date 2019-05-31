@@ -239,17 +239,30 @@ module JWT
       #
       # @param string [String]
       # @return [String]
-      def base64_encode(string)
-        JWT::Encode.base64url_encode(string)
+      if JWT::Encode.respond_to?(:base64url_encode)
+        def base64_encode(string)
+          JWT::Encode.base64url_encode(string)
+        end
+      else
+        def base64_encode(string)
+          JWT::Base64.url_encode(string)
+        end
       end
+
 
       #
       # Decodes string from Base64 format (URL-safe).
       #
       # @param string [String]
       # @return [String]
-      def base64_decode(string)
-        JWT::Decode.base64url_decode(string)
+      if JWT::Decode.respond_to?(:base64url_decode)
+        def base64_decode(string)
+          JWT::Decode.base64url_decode(string)
+        end
+      else
+        def base64_decode(string)
+          JWT::Base64.url_decode(string)
+        end
       end
     end
   end
