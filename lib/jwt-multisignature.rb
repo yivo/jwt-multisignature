@@ -39,13 +39,11 @@ module JWT
       #     }
       # @raise [JWT::EncodeError]
       def generate_jwt(payload, private_keychain, algorithms)
-        proxy_exception JWT::EncodeError do
-          algorithms_mapping = algorithms.with_indifferent_access
-          { payload:    base64_encode(payload.to_json),
-            signatures: private_keychain.map do |id, value|
-              generate_jws(payload, id, value, algorithms_mapping.fetch(id))
-            end }
-        end
+        algorithms_mapping = algorithms.with_indifferent_access
+        { payload:    base64_encode(JSON.generate(payload)),
+          signatures: private_keychain.map do |id, value|
+            generate_jws(payload, id, value, algorithms_mapping.fetch(id))
+          end }
       end
 
       #
@@ -63,11 +61,9 @@ module JWT
       #   The JWT with added JWS.
       # @raise [JWT::EncodeError]
       def add_jws(jwt, key_id, key_value, algorithm)
-        proxy_exception JWT::EncodeError do
-          remove_jws(jwt, key_id).tap do |new_jwt|
-            payload = JSON.parse(base64_decode(new_jwt.fetch(:payload)))
-            new_jwt.fetch(:signatures) << generate_jws(payload, key_id, key_value, algorithm)
-          end
+        remove_jws(jwt, key_id).tap do |new_jwt|
+          payload = JSON.parse(base64_decode(new_jwt.fetch(:payload)))
+          new_jwt.fetch(:signatures) << generate_jws(payload, key_id, key_value, algorithm)
         end
       end
 
@@ -121,26 +117,24 @@ module JWT
       #     }
       # @raise [JWT::DecodeError]
       def verify_jwt(jwt, public_keychain, options = {})
-        proxy_exception JWT::DecodeError do
-          keychain           = public_keychain.with_indifferent_access
-          serialized_payload = base64_decode(jwt.fetch("payload"))
-          payload            = JSON.parse(serialized_payload)
-          verified           = []
-          unverified         = []
+        keychain           = public_keychain.with_indifferent_access
+        serialized_payload = base64_decode(jwt.fetch("payload"))
+        payload            = JSON.parse(serialized_payload)
+        verified           = []
+        unverified         = []
 
-          jwt.fetch("signatures").each do |jws|
-            key_id = jws.fetch("header").fetch("kid")
-            if keychain.key?(key_id)
-              verify_jws(jws, payload, public_keychain, options)
-              verified << key_id
-            else
-              unverified << key_id
-            end
+        jwt.fetch("signatures").each do |jws|
+          key_id = jws.fetch("header").fetch("kid")
+          if keychain.key?(key_id)
+            verify_jws(jws, payload, public_keychain, options)
+            verified << key_id
+          else
+            unverified << key_id
           end
-          { payload:    payload.deep_symbolize_keys,
-            verified:   verified.uniq.map(&:to_sym),
-            unverified: unverified.uniq.map(&:to_sym) }
         end
+        { payload:    payload.deep_symbolize_keys,
+          verified:   verified.uniq.map(&:to_sym),
+          unverified: unverified.uniq.map(&:to_sym) }
       end
 
       #
@@ -164,12 +158,10 @@ module JWT
       #     }
       # @raise [JWT::EncodeError]
       def generate_jws(payload, key_id, key_value, algorithm)
-        proxy_exception JWT::EncodeError do
-          protected, _, signature = JWT.encode(payload, to_pem_or_key(key_value, algorithm), algorithm).split(".")
-          { protected: protected,
-            header:    { kid: key_id },
-            signature: signature }
-        end
+        protected, _, signature = JWT.encode(payload, to_pem_or_key(key_value, algorithm), algorithm).split(".")
+        { protected: protected,
+          header:    { kid: key_id },
+          signature: signature }
       end
 
       #
@@ -194,29 +186,18 @@ module JWT
       #   Returns payload if signature is valid.
       # @raise [JWT::DecodeError]
       def verify_jws(jws, payload, public_keychain, options = {})
-        proxy_exception JWT::DecodeError do
-          encoded_header     = jws.fetch("protected")
-          serialized_header  = base64_decode(encoded_header)
-          serialized_payload = payload.to_json
-          encoded_payload    = base64_encode(serialized_payload)
-          signature          = jws.fetch("signature")
-          public_key         = public_keychain.with_indifferent_access.fetch(jws.fetch("header").fetch("kid"))
-          jwt                = [encoded_header, encoded_payload, signature].join(".")
-          algorithm          = JSON.parse(serialized_header).fetch("alg")
-          JWT.decode(jwt, to_pem_or_key(public_key, algorithm), true, options.merge(algorithms: [algorithm])).first
-        end
+        encoded_header     = jws.fetch("protected")
+        serialized_header  = base64_decode(encoded_header)
+        serialized_payload = JSON.generate(payload)
+        encoded_payload    = base64_encode(serialized_payload)
+        signature          = jws.fetch("signature")
+        public_key         = public_keychain.with_indifferent_access.fetch(jws.fetch("header").fetch("kid"))
+        jwt                = [encoded_header, encoded_payload, signature].join(".")
+        algorithm          = JSON.parse(serialized_header).fetch("alg")
+        JWT.decode(jwt, to_pem_or_key(public_key, algorithm), true, options.merge(algorithms: [algorithm])).first
       end
 
     private
-
-      #
-      # Masks all caught exceptions as different exception class.
-      # @param exception_class [Class]
-      def proxy_exception(exception_class)
-        yield
-      rescue StandardError => e
-        exception_class === e ? raise(e) : raise(exception_class, e.inspect)
-      end
 
       #
       # Transforms key into string (PEM format) or returns as {OpenSSL::PKey::PKey} depending on given algorithm.
