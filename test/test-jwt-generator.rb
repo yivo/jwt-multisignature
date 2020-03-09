@@ -48,7 +48,7 @@ class JWTGeneratorTest < Test::Unit::TestCase
 
   def test_algorithm_is_required
     signers = %w[olsonjacobi.name ebert.biz]
-    e = assert_raises JWT::EncodeError do
+    e = assert_raises KeyError do
       JWT::Multisignature.generate_jwt({}, private_keychain.slice(*signers), algorithms.slice(signers.sample))
     end
     assert_match(/key not found/i, e.message)

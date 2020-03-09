@@ -40,7 +40,7 @@ module JWT
       # @raise [JWT::EncodeError]
       def generate_jwt(payload, private_keychain, algorithms)
         algorithms_mapping = algorithms.with_indifferent_access
-        { payload:    base64_encode(JSON.generate(payload)),
+        { payload:    base64_encode(::JWT::JSON.generate(payload)),
           signatures: private_keychain.map do |id, value|
             generate_jws(payload, id, value, algorithms_mapping.fetch(id))
           end }
@@ -62,7 +62,7 @@ module JWT
       # @raise [JWT::EncodeError]
       def add_jws(jwt, key_id, key_value, algorithm)
         remove_jws(jwt, key_id).tap do |new_jwt|
-          payload = JSON.parse(base64_decode(new_jwt.fetch(:payload)))
+          payload = ::JWT::JSON.parse(base64_decode(new_jwt.fetch(:payload)))
           new_jwt.fetch(:signatures) << generate_jws(payload, key_id, key_value, algorithm)
         end
       end
@@ -119,7 +119,7 @@ module JWT
       def verify_jwt(jwt, public_keychain, options = {})
         keychain           = public_keychain.with_indifferent_access
         serialized_payload = base64_decode(jwt.fetch("payload"))
-        payload            = JSON.parse(serialized_payload)
+        payload            = ::JWT::JSON.parse(serialized_payload)
         verified           = []
         unverified         = []
 
@@ -188,12 +188,12 @@ module JWT
       def verify_jws(jws, payload, public_keychain, options = {})
         encoded_header     = jws.fetch("protected")
         serialized_header  = base64_decode(encoded_header)
-        serialized_payload = JSON.generate(payload)
+        serialized_payload = ::JWT::JSON.generate(payload)
         encoded_payload    = base64_encode(serialized_payload)
         signature          = jws.fetch("signature")
         public_key         = public_keychain.with_indifferent_access.fetch(jws.fetch("header").fetch("kid"))
         jwt                = [encoded_header, encoded_payload, signature].join(".")
-        algorithm          = JSON.parse(serialized_header).fetch("alg")
+        algorithm          = ::JWT::JSON.parse(serialized_header).fetch("alg")
         JWT.decode(jwt, to_pem_or_key(public_key, algorithm), true, options.merge(algorithms: [algorithm])).first
       end
 

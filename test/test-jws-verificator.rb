@@ -28,7 +28,7 @@ class JWSVerificatorTest < Test::Unit::TestCase
     jws     = %({"header":{"kid":"ebert.biz"},"signature":"3nSc9aeRuDyrq_dYQRQX5tnM1wVw6reoUlmQ4JqWIV3LM7yeIDgcVLRYxyb7UUBM0gNqA4QJj3CpwS6vg-EHYQ"})
     payload = { foo: "bar" }
     e       = assert_raise { example jws, payload, {}, payload.to_json }
-    assert_kind_of JWT::DecodeError, e
+    assert_kind_of KeyError, e
     assert_match(/key not found: "protected"/i, e.message)
   end
 
@@ -36,7 +36,7 @@ class JWSVerificatorTest < Test::Unit::TestCase
     jws     = %({"protected":"eyJhbGciOiJSUzI1NiJ9","header":{"kid":"powlowski.info"}})
     payload = {}
     e       = assert_raise { example jws, payload, {}, payload.to_json }
-    assert_kind_of JWT::DecodeError, e
+    assert_kind_of KeyError, e
     assert_match(/key not found: "signature"/i, e.message)
   end
 
@@ -44,15 +44,14 @@ class JWSVerificatorTest < Test::Unit::TestCase
     jws     = %({"protected":"qwerty","header":{"kid":"rice.com"},"signature":"yVzIjLYCl5gaLHAhKYQmyEnvlYq8rhohYVcyqI-zvTJ0ccU4MojHw9_5GvAyeECF1_DXDvY7wbiyRu4nCN1rMw"})
     payload = {}
     e       = assert_raise { example jws, payload, {}, payload.to_json }
-    assert_kind_of JWT::DecodeError, e
-    assert_match(/JSON::ParserError/i, e.message.encode("UTF-8", invalid: :replace, undef: :replace))
+    assert_kind_of JSON::ParserError, e
   end
 
   def test_header_is_required
     jws     = %({"protected":"eyJhbGciOiJSUzUxMiJ9","signature":"oRN-lE_OqSRtUeI1ZkyftpV2PmJPArrX68_3Zm6BHTxjKemyLHdR2D3z58Fm8a-9XnbRpqpawKDoHx3AB2EKZayw8WChKTZv0qZeUx0SH2oo27nCC9b--99D3_E7D4eqb6qlmML7gAlJyeFbl3QD8qEuMC-EyjSm-kyXmxZcNW5myHC4XZayE0GBfS1yzKYbpSI16PKZOUHoFHjMAHm79bFg37V6FB4qKszMyjss_pl6dK0VdGSiDpX-LPaTdh67joPQHIcmDprfMF0pn50RNvorS-5qa8Ev79mozcDLMUb4hrLXZ_x8AWen6XHbwo34nSrd_Fn7-GOaDtsGc0XdfQ"})
     payload = {}
     e       = assert_raise { example jws, payload, {}, payload.to_json }
-    assert_kind_of JWT::DecodeError, e
+    assert_kind_of KeyError, e
     assert_match(/key not found: "header"/i, e.message)
   end
 
@@ -60,7 +59,7 @@ class JWSVerificatorTest < Test::Unit::TestCase
     jws     = %({"protected":"e30","header":{"kid":"wisoky.co"},"signature":"eygCpYrkji7pmmA5sRUFUnwsW-ciZFHSwGVmCSya8Kk"})
     payload = {}
     e       = assert_raise { example jws, payload, {}, payload.to_json }
-    assert_kind_of JWT::DecodeError, e
+    assert_kind_of KeyError, e
     assert_match(/key not found: "alg"/i, e.message)
   end
 
