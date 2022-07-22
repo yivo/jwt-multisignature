@@ -24,7 +24,7 @@ GEM
     test-unit (3.3.5)
       power_assert
     thread_safe (0.3.6)
-    tzinfo (1.2.6)
+    tzinfo (1.2.10)
       thread_safe (~> 0.1)
 
 PLATFORMS
