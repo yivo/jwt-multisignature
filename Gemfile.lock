@@ -2,30 +2,31 @@ PATH
   remote: .
   specs:
     jwt-multisignature (1.0.2)
-      activesupport (>= 4.0, < 6.0)
+      activesupport (>= 4.0, < 8.0)
       jwt (~> 2.2)
 
 GEM
   remote: https://rubygems.org/
   specs:
-    activesupport (5.2.4.1)
+    activesupport (6.1.7.3)
       concurrent-ruby (~> 1.0, >= 1.0.2)
-      i18n (>= 0.7, < 2)
-      minitest (~> 5.1)
-      tzinfo (~> 1.1)
-    concurrent-ruby (1.1.6)
-    i18n (1.8.2)
+      i18n (>= 1.6, < 2)
+      minitest (>= 5.1)
+      tzinfo (~> 2.0)
+      zeitwerk (~> 2.3)
+    concurrent-ruby (1.2.2)
+    i18n (1.12.0)
       concurrent-ruby (~> 1.0)
-    jwt (2.2.1)
+    jwt (2.7.0)
     memoist (0.16.2)
-    minitest (5.14.0)
+    minitest (5.15.0)
     power_assert (1.1.6)
     rake (12.3.3)
     test-unit (3.3.5)
       power_assert
-    thread_safe (0.3.6)
-    tzinfo (1.2.6)
-      thread_safe (~> 0.1)
+    tzinfo (2.0.6)
+      concurrent-ruby (~> 1.0)
+    zeitwerk (2.6.7)
 
 PLATFORMS
   ruby
